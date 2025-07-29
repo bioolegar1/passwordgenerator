@@ -1,13 +1,12 @@
 package br.com.olegari.password_generator.controller;
 
-import br.com.olegari.password_generator.domain.PasswordToken;
-import br.com.olegari.password_generator.dto.PasswordResponse;
+import br.com.olegari.password_generator.dto.PasswordResponse; // Verifique o import
 import br.com.olegari.password_generator.service.PasswordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/passwords")
@@ -16,15 +15,21 @@ public class PasswordController {
 
     private final PasswordService passwordService;
 
-    @GetMapping("/generate")
-    public ResponseEntity<PasswordResponse> generatePassword() {
-        PasswordToken savedToken = passwordService.generateUniquePasswordToken();
-
+    @GetMapping("/current")
+    public ResponseEntity<PasswordResponse> getCurrentPassword() {
+        // O service agora retorna o token com Instant, e o DTO está preparado para isso.
+        var activeToken = passwordService.getCurrentActiveToken();
         PasswordResponse response = new PasswordResponse(
-                savedToken.getTokenValue(),
-                savedToken.getExpiresAt()
+                activeToken.getTokenValue(),
+                activeToken.getExpiresAt()
         );
-
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<Map<String, Boolean>> validatePassword(@RequestBody Map<String, String> payload) {
+        String tokenToValidate = payload.get("token");
+        boolean isValid = passwordService.isTokenValid(tokenToValidate);
+        return ResponseEntity.ok(Map.of("valid", isValid));
     }
 }

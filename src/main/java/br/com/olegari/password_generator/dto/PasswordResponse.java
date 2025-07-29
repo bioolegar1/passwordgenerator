@@ -1,12 +1,10 @@
 package br.com.olegari.password_generator.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.time.LocalDateTime;
+import java.time.Instant; // MUDANÇA IMPORTANTE
 
-// Usando record do Java para um DTO conciso e imutável
+// O campo "expiresAt" agora é um Instant
+// A formatação @JsonFormat foi removida para usar o padrão global (UTC)
 public record PasswordResponse(
         String token,
-
-        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        LocalDateTime expiresAt
+        Instant expiresAt
 ) {}

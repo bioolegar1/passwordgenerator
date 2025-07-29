@@ -1,16 +1,18 @@
-package br.com.olegari.password_generator.repository; // Verifique esta linha
+package br.com.olegari.password_generator.repository;
 
 import br.com.olegari.password_generator.domain.PasswordToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface PasswordTokenRepository extends JpaRepository<PasswordToken, Long> { // Verifique esta linha
+import java.time.Instant; // MUDANÇA IMPORTANTE
+import java.util.Optional;
 
-    /**
-     * Verifica de forma otimizada se um token com o valor fornecido já existe no banco.
-     * @param tokenValue O valor do token a ser verificado.
-     * @return true se o token existir, false caso contrário.
-     */
+@Repository
+public interface PasswordTokenRepository extends JpaRepository<PasswordToken, Long> {
+
     boolean existsByTokenValue(String tokenValue);
+
+    // --- ALTERAÇÃO AQUI ---
+    // O método agora compara um Instant, não mais um LocalDateTime
+    Optional<PasswordToken> findFirstByExpiresAtAfterOrderByCreatedAtDesc(Instant now);
 }
