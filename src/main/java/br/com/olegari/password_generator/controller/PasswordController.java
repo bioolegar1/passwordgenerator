@@ -17,7 +17,6 @@ public class PasswordController {
 
     @GetMapping("/current")
     public ResponseEntity<PasswordResponse> getCurrentPassword() {
-        // O service agora retorna o token com Instant, e o DTO está preparado para isso.
         var activeToken = passwordService.getCurrentActiveToken();
         PasswordResponse response = new PasswordResponse(
                 activeToken.getTokenValue(),

@@ -21,7 +21,6 @@ public class PasswordToken {
     @Column(nullable = false, unique = true, length = 100)
     private String tokenValue;
 
-    // --- ALTERAÇÃO AQUI ---
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -30,6 +29,6 @@ public class PasswordToken {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = Instant.now(); // Instant.now() pega o tempo atual em UTC
+        this.createdAt = Instant.now();
     }
 }

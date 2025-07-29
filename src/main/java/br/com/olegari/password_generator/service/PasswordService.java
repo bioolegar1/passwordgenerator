@@ -31,13 +31,11 @@ public class PasswordService {
 
     private static final String ALL_ALLOWED_CHARS = UPPERCASE_CHARS + LOWERCASE_CHARS + NUMERIC_CHARS;
 
-    // --- LÓGICA DE FUSO HORÁRIO ---
     private static final ZoneId BRASIL_ZONE_ID = ZoneId.of("America/Sao_Paulo");
 
 
     @Transactional
     public synchronized PasswordToken getCurrentActiveToken() {
-        // Usamos Instant.now() que é sempre UTC
         return passwordTokenRepository.findFirstByExpiresAtAfterOrderByCreatedAtDesc(Instant.now())
                 .orElseGet(this::createNewToken);
     }
@@ -59,12 +57,9 @@ public class PasswordService {
         PasswordToken newToken = new PasswordToken();
         newToken.setTokenValue(generatedPassword);
 
-        // --- CÁLCULO DA EXPIRAÇÃO COM BASE NO HORÁRIO DO BRASIL ---
-        // 1. Pega o tempo atual com o fuso horário de São Paulo.
+
         ZonedDateTime nowInBrazil = ZonedDateTime.now(BRASIL_ZONE_ID);
-        // 2. Calcula a "próxima hora cheia" no fuso do Brasil.
         ZonedDateTime expirationInBrazil = nowInBrazil.truncatedTo(ChronoUnit.HOURS).plusHours(1);
-        // 3. Converte o resultado para um Instant (UTC) para salvar no banco.
         Instant expirationInstant = expirationInBrazil.toInstant();
 
         newToken.setExpiresAt(expirationInstant);
